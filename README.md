@@ -125,10 +125,11 @@ OutreachAI/
 | Layer | Technology / Library | Purpose |
 | :--- | :--- | :--- |
 | **Language** | Python 3.12 / 3.14 | Core language for modular implementation |
+| **Primary AI / LLM** | `cohere` (Command R+) | Highly personalized collaboration pitches via Cohere API |
+| **Secondary AI / LLMs**| `groq`, `openai` | Dynamic multi-provider support (LLaMA 3.3 / GPT-4o-mini) |
+| **Fallback AI Engine** | Python Dynamic Semantic Synthesizer | Guarantees 100% functionality even without API keys |
 | **Data Processing** | `pandas`, `pydantic` | Data manipulation, transformation, and CSV export |
 | **Web Dashboard** | `streamlit` | Interactive UI for non-technical review and demo |
-| **AI / LLMs** | `groq`, `openai` | Dynamic message personalization (LLaMA 3.3 / GPT-4o-mini) |
-| **Fallback AI Engine** | Python Dynamic Semantic Synthesizer | Guarantees 100% functionality even without API keys |
 | **CLI Formatting** | `rich` | Beautiful console tables, status indicators, and logs |
 | **Database** | SQLite (`sqlite3`) | Persistent storage, history tracking, and duplicate prevention |
 | **Sending Engine** | `smtplib`, `email.mime` | Standard RFC 5322 email transmission + simulation sandbox |

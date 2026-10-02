@@ -82,3 +82,9 @@ def test_duplicate_prevention():
 
     can_send_invalid, reason_inv = can_send_email("Not Found", sent_history)
     assert can_send_invalid is False
+
+def test_cohere_integration_safe():
+    from src.personalization.generator import call_cohere_llm
+    # Calling without key should safely fail without unhandled exception crashing the process
+    result = call_cohere_llm("test prompt")
+    assert isinstance(result, str)

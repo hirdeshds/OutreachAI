@@ -3,6 +3,7 @@ import re
 from pathlib import Path
 from typing import List, Dict, Any
 from config.settings import (
+    COHERE_API_KEY,
     OPENAI_API_KEY,
     GROQ_API_KEY,
     BRAND_NAME,
@@ -45,6 +46,23 @@ def generate_dynamic_fallback_messages(influencer: Dict[str, Any], brand_name: s
         "generation_engine": "Dynamic Semantic Synthesizer"
     }
 
+def call_cohere_llm(prompt: str) -> str:
+    if not COHERE_API_KEY:
+        return ""
+    try:
+        import cohere
+        client = cohere.ClientV2(api_key=COHERE_API_KEY)
+        response = client.chat(
+            model="command-r-plus-08-2024",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7
+        )
+        if response.message and response.message.content:
+            return response.message.content[0].text or ""
+    except Exception:
+        pass
+    return ""
+
 def call_groq_llm(prompt: str) -> str:
     from groq import Groq
     client = Groq(api_key=GROQ_API_KEY)
@@ -76,7 +94,21 @@ def generate_personalized_messages(influencer: Dict[str, Any]) -> Dict[str, Any]
     dm_body = ""
     engine_used = "Dynamic Semantic Synthesizer"
 
-    if GROQ_API_KEY:
+    if COHERE_API_KEY:
+        try:
+            email_prompt = build_email_prompt(influencer, brand, angle)
+            email_raw = call_cohere_llm(email_prompt)
+            data = json.loads(email_raw[email_raw.find("{"):email_raw.rfind("}")+1])
+            email_subject = data.get("subject", "")
+            email_body = data.get("body", "")
+
+            dm_prompt = build_dm_prompt(influencer, brand, angle)
+            dm_body = call_cohere_llm(dm_prompt).strip('"')
+            engine_used = "Cohere Command R+"
+        except Exception:
+            pass
+
+    if not email_body and GROQ_API_KEY:
         try:
             email_prompt = build_email_prompt(influencer, brand, angle)
             email_raw = call_groq_llm(email_prompt)

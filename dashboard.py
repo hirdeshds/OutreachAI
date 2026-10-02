@@ -37,7 +37,7 @@ def render_sidebar():
     
     st.sidebar.markdown("---")
     st.sidebar.subheader("Campaign Configuration")
-    st.sidebar.info("**Niche:** Fashion & Beauty\n\n**Audience Range:** 5,000 – 100,000\n\n**Min Engagement:** 2.0%\n\n**Email Word Target:** 60–90\n\n**DM Word Target:** 15–30")
+    st.sidebar.info("**Niche:** Fashion & Beauty\n\n**Audience Range:** 5,000 – 100,000\n\n**Min Engagement:** 2.0%\n\n**Email Word Target:** 60–90\n\n**DM Word Target:** 15–30\n\n**AI Engine:** Cohere Command R+ / Groq / Dynamic")
     
     st.sidebar.markdown("---")
     if st.sidebar.button("🚀 Re-Run Full Pipeline", use_container_width=True):
