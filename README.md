@@ -1,6 +1,5 @@
 # OutreachAI - Automated Micro-Influencer Outreach System
 
-> **EDXSO AI Engineer Intern - Assignment 1**
 > Enterprise-grade pipeline for automated micro-influencer discovery, intelligent filtering, profile enrichment, and AI-personalized outreach generation at scale.
 
 ---
@@ -642,5 +641,4 @@ python -m pytest tests/test_pipeline.py -v
 
 ## License
 
-Built for the **EDXSO AI Engineer Intern Assignment 1** evaluation.  
 All creator profile data is publicly sourced or curated for demonstration purposes.
