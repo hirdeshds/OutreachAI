@@ -1,5 +1,7 @@
 import json
 import re
+import httpx
+import cohere
 from pathlib import Path
 from typing import List, Dict, Any
 from config.settings import (
@@ -8,6 +10,9 @@ from config.settings import (
     MESSAGES_DATA_PATH
 )
 from src.personalization.prompts import build_unified_outreach_prompt
+
+_cohere_client = None
+_cohere_rate_limited = False
 
 def count_words(text: str) -> int:
     return len(re.findall(r'\b\w+\b', text))
@@ -79,12 +84,27 @@ def generate_dynamic_fallback_messages(influencer: Dict[str, Any], brand_name: s
         "generation_engine": "Dynamic Semantic Synthesizer"
     }
 
+def get_cohere_client():
+    global _cohere_client
+    if _cohere_client is None and COHERE_API_KEY:
+        try:
+            transport = httpx.HTTPTransport(retries=0)
+            http_cli = httpx.Client(timeout=8.0, transport=transport)
+            _cohere_client = cohere.ClientV2(api_key=COHERE_API_KEY, httpx_client=http_cli)
+        except Exception:
+            pass
+    return _cohere_client
+
 def call_cohere_llm(prompt: str) -> str:
-    if not COHERE_API_KEY:
+    global _cohere_rate_limited
+    if not COHERE_API_KEY or _cohere_rate_limited:
         return ""
+    
+    client = get_cohere_client()
+    if not client:
+        return ""
+
     try:
-        import cohere
-        client = cohere.ClientV2(api_key=COHERE_API_KEY, timeout=12.0)
         response = client.chat(
             model="command-r-08-2024",
             messages=[{"role": "user", "content": prompt}],
@@ -92,8 +112,10 @@ def call_cohere_llm(prompt: str) -> str:
         )
         if response.message and response.message.content:
             return response.message.content[0].text or ""
-    except Exception:
-        pass
+    except Exception as exc:
+        err_msg = str(exc).lower()
+        if "429" in err_msg or "rate limit" in err_msg or "too many requests" in err_msg or "trial" in err_msg:
+            _cohere_rate_limited = True
     return ""
 
 def generate_personalized_messages(influencer: Dict[str, Any]) -> Dict[str, Any]:
@@ -105,7 +127,7 @@ def generate_personalized_messages(influencer: Dict[str, Any]) -> Dict[str, Any]
     dm_body = ""
     engine_used = "Dynamic Semantic Synthesizer"
 
-    if COHERE_API_KEY:
+    if COHERE_API_KEY and not _cohere_rate_limited:
         try:
             prompt = build_unified_outreach_prompt(influencer, brand, angle)
             raw = call_cohere_llm(prompt)
@@ -113,7 +135,7 @@ def generate_personalized_messages(influencer: Dict[str, Any]) -> Dict[str, Any]
             if data and data.get("email_body") and data.get("instagram_dm"):
                 email_subject = data.get("subject", f"Partnership: {brand} x {influencer.get('name')}")
                 email_body = normalize_email_length(data.get("email_body", ""), brand)
-                dm_body = trim_to_word_limit(data.get("instagram_dm", ""), max_words=29)
+                dm_body = trim_to_word_limit(data.get("instagram_dm", ""), max_words=24)
                 engine_used = "Cohere Command R"
         except Exception:
             pass
@@ -143,8 +165,12 @@ def generate_personalized_messages(influencer: Dict[str, Any]) -> Dict[str, Any]
 
 def personalize_all(influencer_list: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     personalized_records = []
-    for influencer in influencer_list:
+    total = len(influencer_list)
+    for idx, influencer in enumerate(influencer_list, start=1):
+        name = influencer.get("name", "Creator")
         record = generate_personalized_messages(influencer)
+        engine = record.get("engine_used", "AI")
+        print(f"  [{idx}/{total}] Personalized: {name} (via {engine})", flush=True)
         personalized_records.append(record)
     return personalized_records
 
