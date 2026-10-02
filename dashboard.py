@@ -14,8 +14,7 @@ from config.settings import (
 from main import run_pipeline
 
 st.set_page_config(
-    page_title="OutreachAI – Micro-Influencer Discovery & Outreach",
-    page_icon="✨",
+    page_title="OutreachAI - Micro-Influencer Discovery & Outreach",
     layout="wide",
     initial_sidebar_state="expanded"
 )
@@ -32,15 +31,15 @@ def load_csv_file(file_path: Path):
     return pd.DataFrame()
 
 def render_sidebar():
-    st.sidebar.title("✨ OutreachAI Studio")
+    st.sidebar.title("OutreachAI Studio")
     st.sidebar.caption("Automated Micro-Influencer Discovery & Outreach")
     
     st.sidebar.markdown("---")
     st.sidebar.subheader("Campaign Configuration")
-    st.sidebar.info("**Niche:** Fashion & Beauty\n\n**Audience Range:** 5,000 – 100,000\n\n**Min Engagement:** 2.0%\n\n**Email Word Target:** 60–90\n\n**DM Word Target:** 15–30\n\n**AI Engine:** Cohere Command R+ / Groq / Dynamic")
+    st.sidebar.info("**Niche:** Fashion & Beauty\n\n**Audience Range:** 5,000 - 100,000\n\n**Min Engagement:** 2.0%\n\n**Email Word Target:** 60-90\n\n**DM Word Target:** 15-30\n\n**AI Engine:** Cohere Command R")
     
     st.sidebar.markdown("---")
-    if st.sidebar.button("🚀 Re-Run Full Pipeline", use_container_width=True):
+    if st.sidebar.button("Re-Run Full Pipeline", use_container_width=True):
         with st.spinner("Executing Discovery -> Filtering -> Enrichment -> Personalization -> Sending..."):
             run_pipeline()
             st.sidebar.success("Pipeline executed successfully!")
@@ -109,7 +108,7 @@ def render_discovery_filtering_tab(filtered_data):
     st.subheader("Disqualification Insights")
     failed_creators = [c for c in all_creators if c["status"] == "FAILED"]
     for c in failed_creators:
-        st.error(f"**{c['name']}** ({c['platform']} | {c['category']} | {c['follower_count']:,} followers) — *{c['filter_reason']}*")
+        st.error(f"**{c['name']}** ({c['platform']} | {c['category']} | {c['follower_count']:,} followers) - *{c['filter_reason']}*")
 
 def render_enrichment_tab(enriched_data):
     st.header("3. Profile Enrichment")
@@ -168,22 +167,22 @@ def render_personalization_tab(messages_data):
         col_email, col_dm = st.columns(2)
         
         with col_email:
-            st.subheader("✉️ A. Email Collaboration Pitch")
+            st.subheader("A. Email Collaboration Pitch")
             email_valid = 60 <= msg["email_word_count"] <= 90
             badge_color = "green" if email_valid else "orange"
-            st.markdown(f"**Length:** :{badge_color}[**{msg['email_word_count']} words**] *(Target: 60–90 words)*")
+            st.markdown(f"**Length:** :{badge_color}[**{msg['email_word_count']} words**] *(Target: 60-90 words)*")
             st.markdown(f"**Angle:** `{msg.get('collaboration_angle')}`")
             st.markdown(f"**Subject:** `{msg.get('email_subject')}`")
             st.text_area("Email Body", msg.get("email_body"), height=250)
 
         with col_dm:
-            st.subheader("💬 B. Instagram DM")
+            st.subheader("B. Instagram DM")
             dm_valid = 15 <= msg["dm_word_count"] <= 30
             dm_badge_color = "green" if dm_valid else "orange"
-            st.markdown(f"**Length:** :{dm_badge_color}[**{msg['dm_word_count']} words**] *(Target: 15–30 words)*")
+            st.markdown(f"**Length:** :{dm_badge_color}[**{msg['dm_word_count']} words**] *(Target: 15-30 words)*")
             st.markdown(f"**Engine Used:** `{msg.get('engine_used')}`")
             st.text_area("DM Text (Ready to send)", msg.get("instagram_dm"), height=150)
-            st.info("💡 **Compliance Safe:** Complies with platform guidelines by queuing messages for simulated or manual operator dispatch.")
+            st.info("**Compliance Safe:** Complies with platform guidelines by queuing messages for simulated or manual operator dispatch.")
 
 def render_sending_tracker_tab(tracker_df):
     st.header("5 & 6. Sending Layer & Outreach Tracker")
@@ -204,7 +203,7 @@ def render_sending_tracker_tab(tracker_df):
 
     csv_data = tracker_df.to_csv(index=False).encode('utf-8')
     st.download_button(
-        label="📥 Download Outreach Tracker CSV",
+        label="Download Outreach Tracker CSV",
         data=csv_data,
         file_name="outreach_tracker.csv",
         mime="text/csv"
@@ -225,10 +224,10 @@ def main():
     st.markdown("---")
 
     tab1, tab2, tab3, tab4 = st.tabs([
-        "🔍 1. Discovery & Filtering",
-        "📊 2. Profile Enrichment",
-        "✍️ 3. AI Personalization",
-        "🚀 4. Sending & Tracker"
+        "1. Discovery & Filtering",
+        "2. Profile Enrichment",
+        "3. AI Personalization",
+        "4. Sending & Tracker"
     ])
 
     with tab1:

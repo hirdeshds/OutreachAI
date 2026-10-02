@@ -19,7 +19,7 @@ DEFAULT_DISCOVERED_DATA: List[Dict[str, Any]] = [
         "audience_age": "18-24 (48%), 25-34 (38%)",
         "audience_gender": "Female (82%)",
         "audience_geography": "United States (64%), Canada (18%)",
-        "bio": "Minimalist skincare enthusiast | Barrier repair & glowing complexion daily ✨"
+        "bio": "Minimalist skincare enthusiast | Barrier repair & glowing complexion daily "
     },
     {
         "name": "Chloe Vance",
@@ -35,7 +35,7 @@ DEFAULT_DISCOVERED_DATA: List[Dict[str, Any]] = [
         "audience_age": "18-24 (55%), 25-34 (32%)",
         "audience_gender": "Female (86%)",
         "audience_geography": "United States (72%), UK (12%)",
-        "bio": "Normalizing skin texture one GRWM at a time 🤍 UGC creator & clean makeup fan"
+        "bio": "Normalizing skin texture one GRWM at a time  UGC creator & clean makeup fan"
     },
     {
         "name": "Elena Rostova",
@@ -115,7 +115,7 @@ DEFAULT_DISCOVERED_DATA: List[Dict[str, Any]] = [
         "audience_age": "18-28 (72%)",
         "audience_gender": "Female (89%)",
         "audience_geography": "United States (77%), UK (11%)",
-        "bio": "Second-hand fashion advocate & creative upcycler. Style on a realistic budget 🌿"
+        "bio": "Second-hand fashion advocate & creative upcycler. Style on a realistic budget "
     },
     {
         "name": "Nadia Osei",
@@ -419,7 +419,7 @@ DEFAULT_DISCOVERED_DATA: List[Dict[str, Any]] = [
         "audience_age": "28-45 (76%)",
         "audience_gender": "Female (90%)",
         "audience_geography": "United States (60%), UK (25%)",
-        "bio": "Pro-aging gracefully ✨ Dermatologist-approved skincare for 30s & beyond."
+        "bio": "Pro-aging gracefully  Dermatologist-approved skincare for 30s & beyond."
     },
     {
         "name": "Leila Kassam",
@@ -803,7 +803,7 @@ DEFAULT_DISCOVERED_DATA: List[Dict[str, Any]] = [
         "audience_age": "18-28 (80%)",
         "audience_gender": "Female (90%)",
         "audience_geography": "United States (74%), UK (16%)",
-        "bio": "Skincare enthusiast tracking ingredient effects. Healthy skin over perfect skin 🤍"
+        "bio": "Skincare enthusiast tracking ingredient effects. Healthy skin over perfect skin "
     },
     {
         "name": "Emma Watson-Cole",
@@ -883,7 +883,7 @@ DEFAULT_DISCOVERED_DATA: List[Dict[str, Any]] = [
         "audience_age": "16-22 (90%)",
         "audience_gender": "Female (95%)",
         "audience_geography": "United States (85%)",
-        "bio": "Just started sharing my thrifting addiction! 💖"
+        "bio": "Just started sharing my thrifting addiction! "
     },
     {
         "name": "Cassandra Blake",

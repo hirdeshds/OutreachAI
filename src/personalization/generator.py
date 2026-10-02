@@ -17,6 +17,11 @@ _cohere_rate_limited = False
 def count_words(text: str) -> int:
     return len(re.findall(r'\b\w+\b', text))
 
+def strip_emojis(text: str) -> str:
+    clean = re.sub(r'[\U00010000-\U0010ffff\u2600-\u26ff\u2700-\u27bf\u200d\ufe0f]', '', text)
+    clean = re.sub(r'[:;=]-?[)D(\]pP]', '', clean)
+    return clean.strip()
+
 def trim_to_word_limit(text: str, max_words: int = 88) -> str:
     words = text.split()
     if len(words) <= max_words:
@@ -133,18 +138,18 @@ def generate_personalized_messages(influencer: Dict[str, Any]) -> Dict[str, Any]
             raw = call_cohere_llm(prompt)
             data = extract_json_object(raw)
             if data and data.get("email_body") and data.get("instagram_dm"):
-                email_subject = data.get("subject", f"Partnership: {brand} x {influencer.get('name')}")
-                email_body = normalize_email_length(data.get("email_body", ""), brand)
-                dm_body = trim_to_word_limit(data.get("instagram_dm", ""), max_words=24)
+                email_subject = strip_emojis(data.get("subject", f"Partnership: {brand} x {influencer.get('name')}"))
+                email_body = strip_emojis(normalize_email_length(data.get("email_body", ""), brand))
+                dm_body = strip_emojis(trim_to_word_limit(data.get("instagram_dm", ""), max_words=24))
                 engine_used = "Cohere Command R"
         except Exception:
             pass
 
     if not email_body or not dm_body:
         fallback = generate_dynamic_fallback_messages(influencer, brand, angle)
-        email_subject = fallback["email_subject"]
-        email_body = fallback["email_body"]
-        dm_body = fallback["instagram_dm"]
+        email_subject = strip_emojis(fallback["email_subject"])
+        email_body = strip_emojis(fallback["email_body"])
+        dm_body = strip_emojis(fallback["instagram_dm"])
         engine_used = fallback["generation_engine"]
 
     return {

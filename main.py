@@ -55,7 +55,7 @@ def export_recommended_dataset_csv(all_evaluated_influencers: list) -> str:
 
 def run_pipeline() -> dict:
     console.print("\n[bold cyan]====================================================[/bold cyan]")
-    console.print("[bold green] Micro-Influencer Outreach System – Pipeline Run [/bold green]")
+    console.print("[bold green] Micro-Influencer Outreach System - Pipeline Run [/bold green]")
     console.print("[bold cyan]====================================================[/bold cyan]\n")
 
     # Step 1: Influencer Discovery

@@ -14,6 +14,7 @@ MANDATORY RULES:
 1. "subject": Catchy, professional subject line (under 10 words).
 2. "email_body": Personalized pitch email. Length MUST BE between 65 and 85 words (STRICT REQUIREMENT: must be at least 60 words and at most 90 words). Paragraph 1: appreciate their specific recent content. Paragraph 2: introduce the {collaboration_angle} campaign and offer full product range gifting plus paid creator compensation. Paragraph 3: ask if they are open to reviewing the campaign brief this week.
 3. "instagram_dm": Punchy, conversational DM. Length MUST BE between 18 and 26 words (STRICT: 15-30 words).
+4. EMOJI BAN: Do NOT include any emojis or emoticons under any circumstances. Use plain text only.
 
 Return ONLY valid JSON in this exact structure:
 {{
