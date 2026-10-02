@@ -4,15 +4,48 @@ from pathlib import Path
 from typing import List, Dict, Any
 from config.settings import (
     COHERE_API_KEY,
-    OPENAI_API_KEY,
-    GROQ_API_KEY,
     BRAND_NAME,
     MESSAGES_DATA_PATH
 )
-from src.personalization.prompts import build_email_prompt, build_dm_prompt
+from src.personalization.prompts import build_unified_outreach_prompt
 
 def count_words(text: str) -> int:
     return len(re.findall(r'\b\w+\b', text))
+
+def trim_to_word_limit(text: str, max_words: int = 88) -> str:
+    words = text.split()
+    if len(words) <= max_words:
+        return text
+    trimmed = " ".join(words[:max_words])
+    last_punc = max(trimmed.rfind("."), trimmed.rfind("!"), trimmed.rfind("?"))
+    if last_punc > int(len(trimmed) * 0.6):
+        return trimmed[:last_punc + 1]
+    return trimmed + "."
+
+def normalize_email_length(email_text: str, brand_name: str) -> str:
+    words_count = count_words(email_text)
+    if words_count < 60:
+        expansion = (
+            f" We deeply value authentic creator storytelling, and we are confident your audience "
+            f"will appreciate testing our gentle, clinical-grade formulations."
+        )
+        email_text = email_text.rstrip() + expansion
+    return trim_to_word_limit(email_text, max_words=88)
+
+def extract_json_object(raw_text: str) -> dict:
+    clean = raw_text.strip()
+    if "```json" in clean:
+        clean = clean.split("```json")[1].split("```")[0].strip()
+    elif "```" in clean:
+        clean = clean.split("```")[1].split("```")[0].strip()
+    start = clean.find("{")
+    end = clean.rfind("}")
+    if start != -1 and end != -1:
+        try:
+            return json.loads(clean[start:end + 1])
+        except Exception:
+            pass
+    return {}
 
 def generate_dynamic_fallback_messages(influencer: Dict[str, Any], brand_name: str, angle: str) -> Dict[str, Any]:
     name = influencer.get("name", "Creator").split()[0]
@@ -51,39 +84,17 @@ def call_cohere_llm(prompt: str) -> str:
         return ""
     try:
         import cohere
-        client = cohere.ClientV2(api_key=COHERE_API_KEY)
+        client = cohere.ClientV2(api_key=COHERE_API_KEY, timeout=12.0)
         response = client.chat(
-            model="command-r-plus-08-2024",
+            model="command-r-08-2024",
             messages=[{"role": "user", "content": prompt}],
-            temperature=0.7
+            temperature=0.6
         )
         if response.message and response.message.content:
             return response.message.content[0].text or ""
     except Exception:
         pass
     return ""
-
-def call_groq_llm(prompt: str) -> str:
-    from groq import Groq
-    client = Groq(api_key=GROQ_API_KEY)
-    response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-        max_tokens=400
-    )
-    return response.choices[0].message.content or ""
-
-def call_openai_llm(prompt: str) -> str:
-    from openai import OpenAI
-    client = OpenAI(api_key=OPENAI_API_KEY)
-    response = client.chat.completions.create(
-        model="gpt-4o-mini",
-        messages=[{"role": "user", "content": prompt}],
-        temperature=0.7,
-        max_tokens=400
-    )
-    return response.choices[0].message.content or ""
 
 def generate_personalized_messages(influencer: Dict[str, Any]) -> Dict[str, Any]:
     brand = BRAND_NAME
@@ -96,43 +107,14 @@ def generate_personalized_messages(influencer: Dict[str, Any]) -> Dict[str, Any]
 
     if COHERE_API_KEY:
         try:
-            email_prompt = build_email_prompt(influencer, brand, angle)
-            email_raw = call_cohere_llm(email_prompt)
-            data = json.loads(email_raw[email_raw.find("{"):email_raw.rfind("}")+1])
-            email_subject = data.get("subject", "")
-            email_body = data.get("body", "")
-
-            dm_prompt = build_dm_prompt(influencer, brand, angle)
-            dm_body = call_cohere_llm(dm_prompt).strip('"')
-            engine_used = "Cohere Command R+"
-        except Exception:
-            pass
-
-    if not email_body and GROQ_API_KEY:
-        try:
-            email_prompt = build_email_prompt(influencer, brand, angle)
-            email_raw = call_groq_llm(email_prompt)
-            data = json.loads(email_raw[email_raw.find("{"):email_raw.rfind("}")+1])
-            email_subject = data.get("subject", "")
-            email_body = data.get("body", "")
-
-            dm_prompt = build_dm_prompt(influencer, brand, angle)
-            dm_body = call_groq_llm(dm_prompt).strip('"')
-            engine_used = "Groq LLaMA 3.3"
-        except Exception:
-            pass
-
-    if not email_body and OPENAI_API_KEY:
-        try:
-            email_prompt = build_email_prompt(influencer, brand, angle)
-            email_raw = call_openai_llm(email_prompt)
-            data = json.loads(email_raw[email_raw.find("{"):email_raw.rfind("}")+1])
-            email_subject = data.get("subject", "")
-            email_body = data.get("body", "")
-
-            dm_prompt = build_dm_prompt(influencer, brand, angle)
-            dm_body = call_openai_llm(dm_prompt).strip('"')
-            engine_used = "OpenAI GPT-4o-mini"
+            prompt = build_unified_outreach_prompt(influencer, brand, angle)
+            raw = call_cohere_llm(prompt)
+            data = extract_json_object(raw)
+            if data and data.get("email_body") and data.get("instagram_dm"):
+                email_subject = data.get("subject", f"Partnership: {brand} x {influencer.get('name')}")
+                email_body = normalize_email_length(data.get("email_body", ""), brand)
+                dm_body = trim_to_word_limit(data.get("instagram_dm", ""), max_words=29)
+                engine_used = "Cohere Command R"
         except Exception:
             pass
 

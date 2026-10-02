@@ -14,8 +14,6 @@ TRACKER_CSV_PATH = DATA_DIR / "outreach" / "outreach_tracker.csv"
 DB_PATH = DATA_DIR / "outreach_history.db"
 
 COHERE_API_KEY = os.getenv("COHERE_API_KEY", "")
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY", "")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 
 SMTP_HOST = os.getenv("SMTP_HOST", "smtp.gmail.com")
 SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
